@@ -26,7 +26,6 @@ app.all('*', function (req, res, next) {
 // 添加打印模板信息
 app.post('/addPrintModel', function(req, res){
   let userInfor = req.body;
-  console.log(req.body);
   let sql = `INSERT INTO printModelInfo SET ?`;
   con.query(sql, userInfor, function(error,results){
     if(error) {
@@ -44,7 +43,6 @@ app.post('/addPrintModel', function(req, res){
 // 编辑打印模板信息
 app.post('/editPrintModel', function(req, res){
     let userInfor = req.body;
-    console.log(req.body);
     // let sql = `UPDATE node_user SET modelName = ? WHERE id = ?`;
     let sql = `UPDATE printModelInfo SET modelName= "${userInfor.modelName}" , modelContent = '${userInfor.modelContent}' , logisticsWork = ${userInfor.logisticsWork} , logisticsCompany = "${userInfor.logisticsCompany}" , status = "${userInfor.status}" WHERE id = ${userInfor.id}`;
     con.query(sql, function(error,results){
@@ -88,6 +86,29 @@ app.get('/getPrintModel', function(req, res){
     })
   });
 
+let query = (sql, values) => {
+    return new Promise((resolve, reject) => {
+        con.query(sql, values, (err, rows) => {
+            if(err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        })
+    })
+}
+
+// 删除打印模板
+app.post('/deleteItemPrintModel', async function(req, res){
+    let getVals = req.body;
+    for (let item in getVals) {
+        let sql = `DELETE FROM printModelInfo WHERE id = ${getVals[item].id}`;
+        const val = await query(sql);
+        if (item == getVals.length-1) {
+            res.json({success: true});
+        }
+    }  
+  });
 
 
 
